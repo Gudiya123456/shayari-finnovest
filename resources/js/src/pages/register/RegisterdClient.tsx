@@ -1,12 +1,14 @@
 import { DataTable, DataTableSortStatus } from 'mantine-datatable';
-import { useEffect, useState } from 'react';
+import React,{ useEffect, useState } from 'react';
 import sortBy from 'lodash/sortBy';
 import { downloadExcel } from 'react-export-table-to-excel';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { setPageTitle } from '../../store/themeConfigSlice';
 import IconBell from '../../components/Icon/IconBell';
 import IconFile from '../../components/Icon/IconFile';
 import IconPrinter from '../../components/Icon/IconPrinter';
+import { IRootState } from '../../store';
+import axios from 'axios';
 
 const rowData = [
     {
@@ -152,11 +154,50 @@ const RegisterdClient = () => {
     useEffect(() => {
         dispatch(setPageTitle('Export Table'));
     });
+
+    const [leads,setLeads]=useState([])
+    const [isLoadig, setIsLoading] = useState(false);
+    useEffect(() => {
+        fetchLeads();
+    },[])
+    const token =useSelector((state:IRootState)=>state.themeConfig.token);
+
+    const fetchLeads = async () => {
+        setIsLoading(true)
+        try {
+            // console.log(window.location.origin)
+            const response = await axios({
+                method: 'get',
+                url: window.location.origin + '/api/register',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization:'Bearer ' + token
+
+                }
+
+            })
+           if(response.data.status=='success'){
+            setLeads(response.data.register);
+            console.log(response.data.register);
+           }
+        } catch (error) {
+            console.log(error)
+
+        }
+        finally {
+            setIsLoading(false);
+
+        }
+    }
     const [page, setPage] = useState(1);
     const PAGE_SIZES = [10, 20, 30, 50, 100];
     const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
-    const [initialRecords, setInitialRecords] = useState(sortBy(rowData, 'id'));
+    const [initialRecords, setInitialRecords] = useState(sortBy(leads));
     const [recordsData, setRecordsData] = useState(initialRecords);
+    console.log("recordsData",recordsData);
+    console.log("recordsData",initialRecords);
+    console.log('leads', leads)
+
 
     const [search, setSearch] = useState('');
     const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({ columnAccessor: 'id', direction: 'asc' });
@@ -173,21 +214,20 @@ const RegisterdClient = () => {
 
     useEffect(() => {
         setInitialRecords(() => {
-            return rowData.filter((item: any) => {
+            return leads
+            .filter((item: any) => {
                 return (
                     item.id.toString().includes(search.toLowerCase()) ||
-                    item.firstName.toLowerCase().includes(search.toLowerCase()) ||
-                    item.lastName.toLowerCase().includes(search.toLowerCase()) ||
-                    item.company.toLowerCase().includes(search.toLowerCase()) ||
+                    item.full_name.toLowerCase().includes(search.toLowerCase())||
                     item.email.toLowerCase().includes(search.toLowerCase()) ||
-                    item.age.toString().toLowerCase().includes(search.toLowerCase()) ||
-                    item.dob.toLowerCase().includes(search.toLowerCase()) ||
-                    item.phone.toLowerCase().includes(search.toLowerCase())
+                    item.phone.toLowerCase().includes(search.toLowerCase()) ||
+                    item.state.toLowerCase().includes(search.toLowerCase()) ||
+                    item.pincode.toLowerCase().includes(search.toLowerCase())
                 );
             });
         });
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [search]);
+    }, [search, leads]);
 
     useEffect(() => {
         const data = sortBy(initialRecords, sortStatus.columnAccessor);
@@ -213,14 +253,14 @@ const RegisterdClient = () => {
             sheet: 'react-export-table-to-excel',
             tablePayload: {
                 header,
-                body: rowData,
+                body: leads,
             },
         });
     }
 
     const exportTable = (type: any) => {
         let columns: any = col;
-        let records = rowData;
+        let records = leads;
         let filename = 'table';
 
         let newVariable: any;
@@ -374,18 +414,11 @@ const RegisterdClient = () => {
                         records={recordsData}
                         columns={[
                             { accessor: 'id', title: '#', sortable: true },
-                            { accessor: 'firstName', sortable: true },
-                            { accessor: 'lastName', sortable: true },
-                            { accessor: 'company', title: 'Company', sortable: true },
-                            { accessor: 'age', title: 'Age', sortable: true },
-                            {
-                                accessor: 'dob',
-                                title: 'Start Date',
-                                sortable: true,
-                                render: ({ dob }) => <div>{formatDate(dob)}</div>,
-                            },
-                            { accessor: 'email', sortable: true },
-                            { accessor: 'phone', sortable: true },
+                            { accessor: 'full_name', sortable: true },
+                            { accessor: 'email', title: 'Email', sortable: true },
+                            { accessor: 'phone', title: 'Phone', sortable: true },
+                            { accessor: 'state', title: 'State', sortable: true },
+                            { accessor: 'pincode', title: 'Pincode', sortable: true },
                         ]}
                         totalRecords={initialRecords.length}
                         recordsPerPage={pageSize}

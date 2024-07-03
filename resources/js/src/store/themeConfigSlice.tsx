@@ -14,6 +14,8 @@ const defaultState = {
     locale: 'en',
     sidebar: false,
     pageTitle: '',
+    token: '',
+    userData:'',
     languageList: [
         { code: 'zh', name: 'Chinese' },
         { code: 'da', name: 'Danish' },
@@ -63,6 +65,10 @@ const initialState = {
         { code: 'tr', name: 'Turkish' },
         { code: 'ae', name: 'Arabic' },
     ],
+token: localStorage.getItem('token') || themeConfig.token,
+userData: JSON.parse(localStorage.getItem('userData')) || themeConfig.userData || themeConfig.userData,
+
+
 };
 
 const themeConfigSlice = createSlice({
@@ -134,11 +140,21 @@ const themeConfigSlice = createSlice({
         },
 
         setPageTitle(state, { payload }) {
-            document.title = `${payload} | VRISTO - Multipurpose Tailwind Dashboard Template`;
+            document.title = `${payload} | Shayari`;
         },
+
+        setToken(state,{payload}){
+            localStorage.setItem('token',payload);
+            state.token=payload;
+        },
+
+        setUserData(state,{payload}){
+            localStorage.setItem('userData', JSON.stringify(payload));
+            state.userData=payload;
+        }
     },
 });
 
-export const { toggleTheme, toggleMenu, toggleLayout, toggleRTL, toggleAnimation, toggleNavbar, toggleSemidark, toggleLocale, toggleSidebar, setPageTitle } = themeConfigSlice.actions;
+export const { setToken,setUserData, toggleTheme, toggleMenu, toggleLayout, toggleRTL, toggleAnimation, toggleNavbar, toggleSemidark, toggleLocale, toggleSidebar, setPageTitle } = themeConfigSlice.actions;
 
 export default themeConfigSlice.reducer;

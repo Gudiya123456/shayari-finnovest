@@ -76,15 +76,10 @@ const Header = () => {
                             <IconMenu className="w-5 h-5" />
                         </button>
                     </div>
-                    <div>
-                        <marquee className=' text-amber-500 hidden md:block' direction="right" behavior="alternate" style={{ border: 'white 2px solid', width: '1300px' }}>
-                           <span>
-                           Finnovest In publishing and graphic design, Lorem ipsum is a placeholder text
-                           </span>
-                        </marquee>
 
-                    </div>
-                    <div className="sm:flex-1 ltr:sm:ml-0 ltr:ml-auto sm:rtl:mr-0 rtl:mr-auto flex items-center space-x-1.5 lg:space-x-2 rtl:space-x-reverse dark:text-[#d0d2d6]">
+                    {/* style={{ border: 'white 2px solid', width: '1300px' }} */}
+                    <marquee  style={{ border: 'white 2px solid', }} className="fs-4 w-[500px] lg:w-[1400px] hidden md:block text-amber-500 fw-bold text-success-emphasis" scrollamount="12" id="latestBroadcast">Finnovest : TGT1 DONE BOOK PROFIT.\nBy Growthlift Investment Private Limited - \nhttps://www.growthlift.co.in</marquee>
+                    <div className="sm:flex-1  ltr:sm:ml-0 ltr:ml-auto sm:rtl:mr-0 rtl:mr-auto flex items-center space-x-1.5 lg:space-x-2 rtl:space-x-reverse dark:text-[#d0d2d6]">
                         <div className="sm:ltr:mr-auto sm:rtl:ml-auto">
 
                             <button
@@ -95,7 +90,7 @@ const Header = () => {
                                 <IconSearch className="w-4.5 h-4.5 mx-auto dark:text-[#d0d2d6]" />
                             </button>
                         </div>
-                        <div>
+                        {/* <div>
 
                             <form
                                 className={`${search && '!block'} sm:relative absolute inset-x-0 sm:top-0 top-1/2 sm:translate-y-0 -translate-y-1/2 sm:mx-0 mx-4 z-10 sm:block hidden`}
@@ -104,7 +99,7 @@ const Header = () => {
                                 <div className="relative">
                                     <input
                                         type="text"
-                                        className="form-input ltr:pl-9 rtl:pr-9 ltr:sm:pr-4 rtl:sm:pl-4 ltr:pr-9 rtl:pl-9 peer sm:bg-transparent bg-gray-100 placeholder:tracking-widest"
+                                        className="form-input ltr:pl-9 rtl:pr-9 w-[250px] ltr:sm:pr-4 rtl:sm:pl-4 ltr:pr-9 rtl:pl-9 peer sm:bg-transparent bg-gray-100 placeholder:tracking-widest"
                                         placeholder="Search..."
                                     />
                                     <button type="button" className="absolute w-9 h-9 inset-0 ltr:right-auto rtl:left-auto appearance-none peer-focus:text-primary">
@@ -115,8 +110,8 @@ const Header = () => {
                                     </button>
                                 </div>
                             </form>
-                        </div>
-                        <div>
+                        </div> */}
+                        {/* <div>
                             {themeConfig.theme === 'light' ? (
                                 <button
                                     className={`${themeConfig.theme === 'light' &&
@@ -155,7 +150,7 @@ const Header = () => {
                                     <IconLaptop />
                                 </button>
                             )}
-                        </div>
+                        </div> */}
 
                         <div className="dropdown shrink-0 flex">
                           <NavLink to='/login' >

@@ -10,6 +10,7 @@ import Swal from 'sweetalert2';
 import { MdDelete } from 'react-icons/md'
 import { RiHome4Line, RiPencilFill } from 'react-icons/ri'
 import { useNavigate } from 'react-router-dom'
+import AddDropdown from './AddDropdown';
 const rowData = [
     {
         id: 1,
@@ -147,10 +148,10 @@ const rowData = [
 
 ];
 
-const Products = () => {
+const Dropdown = () => {
     const dispatch = useDispatch();
     useEffect(() => {
-        dispatch(setPageTitle('Products'));
+        dispatch(setPageTitle('Dropdown'));
     });
 
     const navigate=useNavigate();
@@ -171,7 +172,7 @@ useEffect(()=>{
         try {
             const response=await axios({
                 method:'get',
-                url:window.location.origin+'/api/products',
+                url:window.location.origin+'/api/dropdowns',
                 headers:{
                     'Content-Type':'application/json',
                     Authorization:'Bearer ' + token
@@ -179,8 +180,8 @@ useEffect(()=>{
             })
 
             if(response.data.status=='success'){
-                setProducts(response.data.product);
-                setData(response.data.product);
+                setProducts(response.data.dropdown);
+                setData(response.data.dropdown);
             }
 
         } catch (error) {
@@ -226,10 +227,8 @@ useEffect(()=>{
             return products.filter((item: any) => {
                 return (
                     item.id.toString().includes(search.toLowerCase()) ||
-                    item.p_name.toLowerCase().includes(search.toLowerCase()) ||
-                    item.p_type.toLowerCase().includes(search.toLowerCase()) ||
-                    item.amount.toLowerCase().includes(search.toLowerCase()) ||
-                    item.duration.toLowerCase().includes(search.toLowerCase()) ||
+                    item.value.toLowerCase().includes(search.toLowerCase()) ||
+                    item.dropdown_type.toLowerCase().includes(search.toLowerCase()) ||
                     item.status.toString().toLowerCase().includes(search.toLowerCase())
 
                 );
@@ -261,7 +260,7 @@ useEffect(()=>{
                 try {
                     const response = await axios({
                         method: 'delete',
-                        url: window.location.origin+'/api/products/' + data.id,
+                        url: window.location.origin+'/api/dropdowns/' + data.id,
                         headers: {
                             'Content-Type': 'application/json',
                             Authorization: "Bearer " + token,
@@ -287,28 +286,26 @@ useEffect(()=>{
 
     return (
         <div>
-            <AddProducts showDrawer={showDrawer} setShowDrawer={setShowDrawer} data={data} fetchProducts={fetchProducts} />
+            <AddDropdown showDrawer={showDrawer} setShowDrawer={setShowDrawer} data={data} fetchProducts={fetchProducts} />
 
             <div className="panel ">
                 <div className="flex md:items-center justify-between md:flex-row flex-col mb-4.5 gap-5">
                     <div className="flex items-center flex-wrap">
 
 
-                        <h2 className='text-amber-500 text-xl font-bold ' >Products</h2>
+                        <h2 className='text-amber-500 text-xl font-bold ' >Dropdowns</h2>
                     </div>
 
                   <div className='flex gap-2' >
                   <input type="text" className="form-input w-auto" placeholder="Search..." value={search} onChange={(e) => setSearch(e.target.value)} />
                   <button type="button" onClick={()=>{handleDrawable(
                     {
-                        'p_name':'',
-                        "p_type":'',
-                        'amount':'',
-                        'duration':'',
+                        'value':'',
+                        "dropdown_type":'',
                         'status':''
                     }
                   )}} className="btn bg-amber-500 text-white btn-sm m-1">
-                            Create Products
+                            Create Dropdown
                         </button>
                   </div>
                 </div>
@@ -319,16 +316,11 @@ useEffect(()=>{
                         records={products}
                         columns={[
                             { accessor: 'id', title: '#', sortable: true },
-                            { accessor: 'p_name',title:'Product Name', sortable: true },
-                            { accessor: 'p_type',title:'Product Type', sortable: true },
-                            { accessor: 'amount', title: 'Amount', sortable: true },
-                            { accessor: 'duration', title: 'Duration', sortable: true },
-
-
+                            { accessor: 'dropdown_type',title:'Lead Status', sortable: true },
+                            { accessor: 'value', title: 'Dropdown Name', sortable: true },
                             { accessor: 'status',title:'Status', sortable: true,
                                 render: ({status}) => <label  className="w-12 h-6 relative">
                                     <p className=' text-amber-500' >{status=='1'?'Active':'Disabled'}</p>
-
                             </label>,
                              },
                             { accessor: 'action', title: 'Action', sortable: true,
@@ -362,4 +354,4 @@ useEffect(()=>{
     );
 };
 
-export default Products;
+export default Dropdown;

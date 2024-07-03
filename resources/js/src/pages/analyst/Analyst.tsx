@@ -1,5 +1,5 @@
 import { DataTable, DataTableSortStatus } from 'mantine-datatable';
-import { useEffect, useState } from 'react';
+import React,{ useEffect, useState } from 'react';
 import sortBy from 'lodash/sortBy';
 import { downloadExcel } from 'react-export-table-to-excel';
 import { useDispatch } from 'react-redux';
@@ -145,7 +145,6 @@ const rowData = [
 
 ];
 
-const col = ['id', 'firstName', 'lastName', 'company', 'age', 'dob', 'email', 'phone'];
 
 const Analyst = () => {
     const dispatch = useDispatch();
@@ -195,148 +194,8 @@ const Analyst = () => {
         setPage(1);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [sortStatus]);
-    const header = ['Id', 'Firstname', 'Lastname', 'Email', 'Start Date', 'Phone No.', 'Age', 'Company'];
 
-    const formatDate = (date: any) => {
-        if (date) {
-            const dt = new Date(date);
-            const month = dt.getMonth() + 1 < 10 ? '0' + (dt.getMonth() + 1) : dt.getMonth() + 1;
-            const day = dt.getDate() < 10 ? '0' + dt.getDate() : dt.getDate();
-            return day + '/' + month + '/' + dt.getFullYear();
-        }
-        return '';
-    };
 
-    function handleDownloadExcel() {
-        downloadExcel({
-            fileName: 'table',
-            sheet: 'react-export-table-to-excel',
-            tablePayload: {
-                header,
-                body: rowData,
-            },
-        });
-    }
-
-    const exportTable = (type: any) => {
-        let columns: any = col;
-        let records = rowData;
-        let filename = 'table';
-
-        let newVariable: any;
-        newVariable = window.navigator;
-
-        if (type === 'csv') {
-            let coldelimiter = ';';
-            let linedelimiter = '\n';
-            let result = columns
-                .map((d: any) => {
-                    return capitalize(d);
-                })
-                .join(coldelimiter);
-            result += linedelimiter;
-            // eslint-disable-next-line array-callback-return
-            records.map((item: any) => {
-                // eslint-disable-next-line array-callback-return
-                columns.map((d: any, index: any) => {
-                    if (index > 0) {
-                        result += coldelimiter;
-                    }
-                    let val = item[d] ? item[d] : '';
-                    result += val;
-                });
-                result += linedelimiter;
-            });
-
-            if (result == null) return;
-            if (!result.match(/^data:text\/csv/i) && !newVariable.msSaveOrOpenBlob) {
-                var data = 'data:application/csv;charset=utf-8,' + encodeURIComponent(result);
-                var link = document.createElement('a');
-                link.setAttribute('href', data);
-                link.setAttribute('download', filename + '.csv');
-                link.click();
-            } else {
-                var blob = new Blob([result]);
-                if (newVariable.msSaveOrOpenBlob) {
-                    newVariable.msSaveBlob(blob, filename + '.csv');
-                }
-            }
-        } else if (type === 'print') {
-            var rowhtml = '<p>' + filename + '</p>';
-            rowhtml +=
-                '<table style="width: 100%; " cellpadding="0" cellcpacing="0"><thead><tr style="color: #515365; background: #eff5ff; -webkit-print-color-adjust: exact; print-color-adjust: exact; "> ';
-            // eslint-disable-next-line array-callback-return
-            columns.map((d: any) => {
-                rowhtml += '<th>' + capitalize(d) + '</th>';
-            });
-            rowhtml += '</tr></thead>';
-            rowhtml += '<tbody>';
-
-            // eslint-disable-next-line array-callback-return
-            records.map((item: any) => {
-                rowhtml += '<tr>';
-                // eslint-disable-next-line array-callback-return
-                columns.map((d: any) => {
-                    let val = item[d] ? item[d] : '';
-                    rowhtml += '<td>' + val + '</td>';
-                });
-                rowhtml += '</tr>';
-            });
-            rowhtml +=
-                '<style>body {font-family:Arial; color:#495057;}p{text-align:center;font-size:18px;font-weight:bold;margin:15px;}table{ border-collapse: collapse; border-spacing: 0; }th,td{font-size:12px;text-align:left;padding: 4px;}th{padding:8px 4px;}tr:nth-child(2n-1){background:#f7f7f7; }</style>';
-            rowhtml += '</tbody></table>';
-            var winPrint: any = window.open('', '', 'left=0,top=0,width=1000,height=600,toolbar=0,scrollbars=0,status=0');
-            winPrint.document.write('<title>Print</title>' + rowhtml);
-            winPrint.document.close();
-            winPrint.focus();
-            winPrint.print();
-        } else if (type === 'txt') {
-            let coldelimiter = ',';
-            let linedelimiter = '\n';
-            let result = columns
-                .map((d: any) => {
-                    return capitalize(d);
-                })
-                .join(coldelimiter);
-            result += linedelimiter;
-            // eslint-disable-next-line array-callback-return
-            records.map((item: any) => {
-                // eslint-disable-next-line array-callback-return
-                columns.map((d: any, index: any) => {
-                    if (index > 0) {
-                        result += coldelimiter;
-                    }
-                    let val = item[d] ? item[d] : '';
-                    result += val;
-                });
-                result += linedelimiter;
-            });
-
-            if (result == null) return;
-            if (!result.match(/^data:text\/txt/i) && !newVariable.msSaveOrOpenBlob) {
-                var data1 = 'data:application/txt;charset=utf-8,' + encodeURIComponent(result);
-                var link1 = document.createElement('a');
-                link1.setAttribute('href', data1);
-                link1.setAttribute('download', filename + '.txt');
-                link1.click();
-            } else {
-                var blob1 = new Blob([result]);
-                if (newVariable.msSaveOrOpenBlob) {
-                    newVariable.msSaveBlob(blob1, filename + '.txt');
-                }
-            }
-        }
-    };
-
-    const capitalize = (text: any) => {
-        return text
-            .replace('_', ' ')
-            .replace('-', ' ')
-            .toLowerCase()
-            .split(' ')
-            .map((s: any) => s.charAt(0).toUpperCase() + s.substring(1))
-            .join(' ');
-    };
 
     const [showDrawer,setShowDrawer]=useState(false)
     return (
@@ -364,19 +223,18 @@ const Analyst = () => {
                         records={recordsData}
                         columns={[
                             { accessor: 'id', title: '#', sortable: true },
-                            { accessor: 'firstName',title:'Name', sortable: true },
-                            { accessor: 'email', sortable: true },
-                            { accessor: 'phone', sortable: true },
-                            { accessor: 'company', title: 'State', sortable: true },
-                            { accessor: 'company', title: 'City', sortable: true },
+                            { accessor: 'firstName',title:'Owner', sortable: true },
+                            // { accessor: 'email', sortable: true },
+                            // { accessor: 'phone', sortable: true },
+                            { accessor: 'company', title: 'Product', sortable: true },
+                            { accessor: 'company', title: 'Client', sortable: true },
+                            { accessor: 'company', title: 'Dates', sortable: true },
 
-                            { accessor: 'lastName',title:'Source', sortable: true },
+
                             { accessor: 'status',title:'Status', sortable: true,
                                 render: ({status}) => <label  className="w-12 h-6 relative">
                                     <p className=' text-amber-500' >Active</p>
-                                {/* <input type="checkbox" defaultChecked={status==1?true:false} className="custom_switch absolute w-full h-full opacity-0 z-10 cursor-pointer peer" id="custom_switch_checkbox1"
 
-                                /> */}
                                 {/* <span className="bg-[#ebedf2] dark:bg-dark block h-full rounded-full before:absolute before:left-1 before:bg-white dark:before:bg-white-dark dark:peer-checked:before:bg-white before:bottom-1 before:w-4 before:h-4 before:rounded-full peer-checked:before:left-7 peer-checked:bg-amber-500 before:transition-all before:duration-300"></span> */}
                             </label>,
                              },

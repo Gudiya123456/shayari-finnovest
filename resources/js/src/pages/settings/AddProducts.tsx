@@ -1,12 +1,148 @@
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { IoCloseSharp } from "react-icons/io5";
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import Swal from 'sweetalert2';
 import { IRootState } from '../../store';
+import themeConfig from '../../theme.config';
+import axios from 'axios';
+import Swal from 'sweetalert2';
 
 
-export default function AddProducts({ showDrawer, setShowDrawer }) {
+export default function AddProducts({ showDrawer, setShowDrawer , data, fetchProducts }) {
+    console.log("data",data);
+    const token = useSelector((state:IRootState)=>state.themeConfig.token);
+    const navigate=useNavigate();
+    const[btnLoading,setBtnLoading]=useState(false);
+
+
+    const defaultParams=
+       {
+        id:'',
+        p_name:'',
+        p_type:'',
+        amount:'',
+        duration:'',
+        status:'1'
+       }
+       const[params,setParams]=useState<any>(defaultParams);
+       const[errors,setErrors]=useState<any>({});
+
+       useEffect(()=>{
+        if(data?.id){
+            setParams({
+                id:data.id,
+                p_name:data.p_name,
+                p_type:data.p_type,
+                amount:data.amount,
+                duration:data.duration,
+                status:data.status,
+            })
+        }
+        else setParams(defaultParams);
+        // alert(9999)
+       },[data]);
+
+       console.log("defaultParams",defaultParams);
+       console.log('params', params);
+       console.log("dattaaa",data);
+
+
+
+
+    const changeValue=(e:any)=>{
+       const {value,name}=e.target;
+       setErrors({...errors,[name]:""});
+       setParams({...params, [name]:value});
+    }
+
+    const validate=()=>{
+        setErrors({});
+        let errors={};
+        if(!params.p_name){
+            errors={...errors, p_name:'Product name is requred'}
+        }
+        console.log(errors);
+        setErrors(errors);
+        return{totalErrors:Object.keys(errors).length}
+    }
+    const storeOrUpdateApi = async (data: any) => {
+        setBtnLoading(true)
+        try {
+            const response = await axios({
+                method: 'post',
+                url: window.location.origin+'/api/products',
+                data,
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                    Authorization: "Bearer " + token,
+                },
+            });
+
+            if (response.data.status == 'success') {
+                fetchProducts();
+                setShowDrawer(false)
+                setParams(defaultParams)
+                Swal.fire({
+                    icon: response.data.status,
+                    title: response.data.title,
+                    text: response.data.message,
+                    padding: '2em',
+                    customClass: 'sweet-alerts',
+                });
+
+                if (response.data.status == "success") {
+                    alert('successs')
+                } else {
+                    alert(9)
+                }
+
+            } else {
+
+                alert("Failed")
+            }
+
+        } catch (error: any) {
+            console.log(error)
+            if (error.response.status == 401) navigate('/login')
+            if (error?.response?.status === 422) {
+                const serveErrors = error.response.data.errors;
+                let serverErrors = {};
+                for (var key in serveErrors) {
+                    serverErrors = { ...serverErrors, [key]: serveErrors[key][0] };
+                    console.log(serveErrors[key][0])
+                }
+                setErrors(serverErrors);
+                CrmSwal.fire({
+                    title: "Server Validation Error! Please solve",
+                    toast: true,
+                    position: 'top',
+                    showConfirmButton: false,
+                    showCancelButton: false,
+                    width: 450,
+                    timer: 2000,
+                    customClass: {
+                        popup: "color-danger"
+                    }
+                });
+            }
+        } finally {
+            setBtnLoading(false)
+        }
+    };
+
+    const formSubmit = () => {
+        const isValid = validate();
+        if (isValid.totalErrors) return false;
+        const data = new FormData();
+        data.append("id", params.id);
+        data.append("p_name", params.p_name);
+        data.append("p_type", params.p_type);
+        data.append("amount", params.amount);
+        data.append("duration", params.duration);
+        data.append("status", params.status);
+        storeOrUpdateApi(data);
+    };
+
 
     return (
         <div>
@@ -22,20 +158,20 @@ export default function AddProducts({ showDrawer, setShowDrawer }) {
                             <IoCloseSharp className=" w-5 h-5" />
                         </button>
 
-                        <h4 className="mb-1 dark:text-white font-bold"> <span className='text-yellow-500' ></span> Add Product</h4>
+                        <h4 className="mb-1 dark:text-white font-bold"> <span className='text-yellow-500' ></span> {params.id?'Update':'Add'} Product</h4>
                     </div>
 
                     <section className="flex-1 overflow-y-auto overflow-x-hidden perfect-scrollbar mt-5">
                         <form action="" method="post" className='p-5'>
-                            {/* <div className='mb-4 poppins-font'>
-                                <label htmlFor="fullname" className='text-white-dark text-style poppins-font'>Gateway Name</label>
-                                <input id="fullname" type="text" placeholder="Enter Gateway Name" className="input-form poppins-font placeholder-black "
-                                name='gateway_name'
-                                value={params.gateway_name}
+                            <div className='mb-3 poppins-font'>
+                                <label htmlFor="fullname" className='text-white-dark text-style poppins-font'>Product Name</label>
+                                <input id="fullname" type="text"  className="input-form poppins-font placeholder-black "
+                                name='p_name'
+                                value={params.p_name}
                                 onChange={(e)=>{changeValue(e)}}
                                 />
-                                <span className='text-red-700' >{errors.gateway_name}</span>
-                            </div> */}
+                                <span className='text-red-700' >{errors.p_name}</span>
+                            </div>
                             <div className="mb-3">
                           <label
                             htmlFor="name"
@@ -46,9 +182,9 @@ export default function AddProducts({ showDrawer, setShowDrawer }) {
 
                           <select
                             className="input-form h-[33px] poppins-font  dark:border-[#5E5E5E] dark:bg-transparent"
-                            name='environment'
-                            // value={params.environment ? params.environment : ""}
-                            // onChange={(e)=>{changeValue(e)}}
+                            name='p_type'
+                            value={params.p_type ? params.p_type : ""}
+                            onChange={(e)=>{changeValue(e)}}
                             >
                             <option className="poppins-font text-red-600" value="">
                               Select Product
@@ -61,7 +197,7 @@ export default function AddProducts({ showDrawer, setShowDrawer }) {
                             </option>
 
                           </select>
-                          {/* <span className='text-red-700' >{errors.environment}</span> */}
+                          <span className='text-red-700' >{errors.p_type}</span>
 
 
 
@@ -70,21 +206,21 @@ export default function AddProducts({ showDrawer, setShowDrawer }) {
                             <div className='mb-3'>
                                 <label htmlFor="fullname" className='text-white-dark text-style poppins-font'>Enter Amount</label>
                                 <input id="fullname" type="text"  className="input-form  poppins-font placeholder-black"
-                                name='key'
-                                // value={params.key}
-                                // onChange={(e)=>{changeValue(e)}}
+                                name='amount'
+                                value={params.amount}
+                                onChange={(e)=>{changeValue(e)}}
                                 />
-                                {/* <span className='text-red-700' >{errors.key}</span> */}
+                                <span className='text-red-700' >{errors.amount}</span>
                             </div>
 
                             <div className='mb-3'>
                                 <label htmlFor="fullname" className='text-white-dark text-style poppins-font'>Duration</label>
                                 <input id="fullname" type="text"  className=" input-form poppins-font placeholder-black"
-                                name='secret'
-                                // value={params.secret}
-                                // onChange={(e)=>{changeValue(e)}}
+                                name='duration'
+                                value={params.duration}
+                                onChange={(e)=>{changeValue(e)}}
                                 />
-                                {/* <span className='text-red-700' >{errors.secret}</span> */}
+                                <span className='text-red-700' >{errors.duration}</span>
                             </div>
 
                               <div className="mb-3">
@@ -97,9 +233,9 @@ export default function AddProducts({ showDrawer, setShowDrawer }) {
 
                           <select
                             className="input-form h-[33px] poppins-font  dark:border-[#5E5E5E] dark:bg-transparent"
-                            name='environment'
-                            // value={params.environment ? params.environment : ""}
-                            // onChange={(e)=>{changeValue(e)}}
+                            name='status'
+                            value={params.status ? params.status : ""}
+                            onChange={(e)=>{changeValue(e)}}
                             >
                             <option className="poppins-font text-red-600" value="">
                               Select Status
@@ -112,7 +248,7 @@ export default function AddProducts({ showDrawer, setShowDrawer }) {
                             </option>
 
                           </select>
-                          {/* <span className='text-red-700' >{errors.environment}</span> */}
+                          <span className='text-red-700' >{errors.status}</span>
 
 
 
@@ -123,8 +259,10 @@ export default function AddProducts({ showDrawer, setShowDrawer }) {
                     <footer className="w-full text-center border-t border-grey p-4">
                         <div className='flex justify-end gap-5 py-2'>
                             <button className='btn shadow' onClick={() => setShowDrawer(false)}>Cancel</button>
-                            <button className='btn bg-amber-500 text-white'  >
-                                Submit
+                            <button type='button' disabled={btnLoading} onClick={()=>{formSubmit()}} className='btn bg-amber-500 text-white'  >
+                              {
+                                btnLoading?'Please wait':'Submit'
+                              }
                               </button>
                         </div>
                     </footer>

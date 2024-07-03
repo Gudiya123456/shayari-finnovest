@@ -6,6 +6,7 @@ import Index from '../pages/dashboard/Index';
 import Settings from '../pages/settings/Settings';
 import Analyst from '../pages/analyst/Analyst';
 import Login from '../pages/auth/Login';
+import AddLeads from '../pages/leads/AddLeads';
 
 
 
@@ -24,6 +25,11 @@ const routes = [
     {
         path: '/leads',
         element: <Leads />,
+        layout: 'default',
+    },
+    {
+        path: '/leads/add',
+        element: <AddLeads />,
         layout: 'default',
     },
     {

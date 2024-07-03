@@ -4,3 +4,47 @@
   .input-form {
     @apply w-full rounded-md text-[13px] border border-[#D2D6DB] bg-white px-2 py-1;
   }
+
+  .button {
+    display: flex;
+    /* justify-content: center; */
+    align-items: center;
+    padding: 9px 12px;
+    gap: 8px;
+    height: 40px;
+    /* width: 201px; */
+    border: none;
+    background: #f59e0b;
+    border-radius: 10px;
+    cursor: pointer;
+  }
+
+  .lable {
+    line-height: 22px;
+    font-size: 15px;
+    color: #fff;
+    font-family: sans-serif;
+    letter-spacing: 1px;
+  }
+
+  .button:hover {
+    background: navy;
+  }
+
+  .button:hover .svg-icon {
+    animation: slope 1s linear infinite;
+  }
+
+  @keyframes slope {
+    0% {
+    }
+
+    50% {
+      transform: rotate(10deg);
+    }
+
+    100% {
+    }
+  }
+
+
